@@ -48,6 +48,58 @@ for (let i = 0; i < testimonialsItem.length; i++) {
   });
 
 }
+document.addEventListener("DOMContentLoaded", function () {
+  const form = document.querySelector("[data-form]");
+  const submitBtn = document.querySelector("[data-form-btn]");
+  const inputs = document.querySelectorAll("[data-form-input]");
+
+  // Enable submit button when all fields are filled
+  function checkInputs() {
+      let allFilled = true;
+      inputs.forEach(input => {
+          if (!input.value.trim()) {
+              allFilled = false;
+          }
+      });
+      submitBtn.disabled = !allFilled;
+  }
+
+  // Listen for input changes
+  inputs.forEach(input => {
+      input.addEventListener("input", checkInputs);
+  });
+
+  form.addEventListener("submit", function (event) {
+      event.preventDefault(); // Prevent page reload
+
+      submitBtn.disabled = true; // Disable button while submitting
+
+      const formData = new FormData(form);
+
+      fetch("https://formspree.io/f/xkgoreye", {
+          method: "POST",
+          body: formData,
+          headers: { "Accept": "application/json" }
+      })
+      .then(response => {
+          if (response.ok) {
+              form.reset(); // Clear form fields
+              submitBtn.disabled = true; // Disable button again after reset
+              alert("Message sent successfully! ✅");
+          } else {
+              alert("Failed to send message. ❌ Try again.");
+          }
+      })
+      .catch(error => {
+          alert("Error occurred while sending message. ❌");
+          console.error(error);
+      })
+      .finally(() => {
+          checkInputs(); // Check inputs again after submission
+      });
+  });
+});
+
 
 // add click event to modal close button
 modalCloseBtn.addEventListener("click", testimonialsModalFunc);
